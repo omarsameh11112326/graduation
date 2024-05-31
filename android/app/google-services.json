@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "685765647241",
+    "firebase_url": "https://saferoad-57472-default-rtdb.firebaseio.com",
     "project_id": "saferoad-57472",
     "storage_bucket": "saferoad-57472.appspot.com"
   },
@@ -29,6 +30,13 @@
             {
               "client_id": "685765647241-oaa0q130k9rm04sjo15g0mie51t48d2j.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "685765647241-96ln2brrtmrk91nsojepafejrrke687n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appProject.RunnerTests"
+              }
             }
           ]
         }

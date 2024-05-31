@@ -1,8 +1,57 @@
+import 'package:app_project/Pages/Services.dart';
+import 'package:app_project/Pages/home.dart';
+import 'package:app_project/Pages/serviceProviderPages/profileServiceProvider.dart';
+import 'package:app_project/helper/showSnackBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class requestToService extends StatelessWidget {
+class requestToService extends StatefulWidget {
   requestToService({Key? key});
+
+  @override
+  State<requestToService> createState() => _requestToServiceState();
+}
+
+class _requestToServiceState extends State<requestToService> {
+
+String? price;
+
+String? TypeOfService;
+late String phone = '';
+  late String userId;
+  bool isLoading = false;
+
+
+
+int _selectedIndex = 0; // Current tab index
+
+
+ 
+
+  void _onItemTapped(int index) {
+  setState(() {
+    _selectedIndex = index;
+  });
+
+  switch (index) {
+    case 0:
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home(userId: '',)));
+      break;
+    case 1:
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileServiceProvider()));
+      break;
+    case 2:
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const Services()));
+      break;
+    case 3:
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home(userId: '',)));
+      break;
+    default:
+      break;
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +121,7 @@ class requestToService extends StatelessWidget {
                               children: [
                                 const Icon(Icons.design_services),
                                 Text(
-                                  'Type Of Service : $serviceType',
+                                  'Type Of Service : $serviceType ',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -85,10 +134,14 @@ class requestToService extends StatelessWidget {
                               children: [
                                 const Icon(Icons.chat),
                                 Text(
+                                  
                                   'Description : $description',
+                                  maxLines: 3,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    overflow: TextOverflow.ellipsis,
+                                    
                                   ),
                                 ),
                               ],
@@ -98,11 +151,15 @@ class requestToService extends StatelessWidget {
                               padding: const EdgeInsets.only(left: 50.0),
                               child: Row(
                                 children: [
-                                  const SizedBox(
+                                   SizedBox(
                                     width: 80,
                                     height: 35,
                                     child: TextField(
-                                      decoration: InputDecoration(
+                                      onChanged: (data){
+                                        price=data;
+
+                                      },
+                                      decoration: const InputDecoration(
                                         hintText: "Set Price",
                                         fillColor: Colors.black,
                                       ),
@@ -110,7 +167,19 @@ class requestToService extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 70),
                                   GestureDetector(
-                                    onTap: () {},
+                                    onTap: () async{
+                                     String documentId = snapshot.data!.docs[index].id;
+
+                                  
+                                      try {
+                                        await ServiceProviderResponse(price!,serviceType);
+                                        await DeleteDoc(documentId);
+                                        showSnackBar(context, 'success');
+                                        }catch(e){
+                                          print(e);
+                                        }
+
+                                    },
                                     child: Container(
                                       height: 40,
                                       width: 100,
@@ -146,9 +215,128 @@ class requestToService extends StatelessWidget {
                 },
               ),
             );
+            
           },
         ),
+
+       bottomNavigationBar: BottomNavigationBar(
+  items: const <BottomNavigationBarItem>[
+    BottomNavigationBarItem(
+      icon: Icon(Icons.account_balance_wallet),
+      label: 'Wallet',
+    ),
+    
+    BottomNavigationBarItem(
+      icon: Icon(Icons.person),
+      label: 'Profile',
+    ),  
+    BottomNavigationBarItem(
+      icon: Icon(Icons.request_page),
+      label: 'Requests',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(Icons.arrow_circle_right_rounded),
+      label: 'User Mode',
+    ),
+  ],
+  currentIndex: _selectedIndex,
+  selectedItemColor: Colors.blue.shade900,
+  unselectedItemColor: Colors.grey, // Set unselected icon color
+  onTap: _onItemTapped,
+),
+
       ),
     );
   }
+
+  
+     Future<void> getUserId() async {
+    // Get the current user ID from Firebase Authentication
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        userId = user.uid;
+      });
+    }
+  }
+
+  // Function to fetch data from Firestore
+  Future<String?> getPhoneNumber() async {
+  try {
+    // Get the current user ID from Firebase Authentication
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Fetch documents from Firestore based on "userId" field
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('form')
+          .where('userId', isEqualTo: user.uid) // Filter by user ID
+          .get();
+
+      // Check if any documents match the query
+      if (querySnapshot.docs.isNotEmpty) {
+        // Assume there's only one document per user, use the first one
+        DocumentSnapshot documentSnapshot = querySnapshot.docs[0];
+
+        // Safely access and handle potential null data
+        Map<String, dynamic>? userData = documentSnapshot.data() as Map<String, dynamic>?;
+
+        if (userData != null) {
+          // Return the phone number
+          return userData['phone'];
+        } else {
+          // Handle case where data is null (should not normally happen if document exists)
+          print('Document data is null for user ID: ${user.uid}');
+        }
+      } else {
+        // No document found for the specified user ID
+        print('No document found for user ID: ${user.uid}');
+      }
+    } else {
+      print('User is not authenticated.');
+    }
+  } catch (error) {
+    // Handle errors
+    print('Error fetching phone number: $error');
+  }
+  return null; // Return null if there's an error or no phone number found
+}
+  Future<void> ServiceProviderResponse(String price, String TypeOfService) async {
+  try {
+    // Access Firestore instance
+    final firestore = FirebaseFirestore.instance;
+
+    // Fetch phone number from Firestore 'form' collection
+    String? phoneNumber = await getPhoneNumber();
+
+    DocumentReference docRef = await firestore.collection('serviceProviderRequest').add({
+      'price': price,
+      'typeOfServide': TypeOfService,
+      'phoneNumper': phoneNumber, // Add phone number to the document
+    });
+
+    print('Document added with ID: ${docRef.id}');
+  } catch (error) {
+    // Handle errors
+    print('Error saving user request: $error');
+  }
+}
+
+Future<void> DeleteDoc(String documentId) async {
+  try {
+    // Access Firestore instance
+    final firestoreInstance = FirebaseFirestore.instance;
+
+    // Add document to 'userRequest' collection
+    DocumentReference docRef = firestoreInstance.collection('userRequest').doc(documentId);
+
+    await docRef.delete();
+
+    // Optionally, you can show a success message or navigate to a new screen here
+  } catch (error) {
+    // Handle errors
+    print('Error deleting user request: $error');
+  }
+}
+
+
 }

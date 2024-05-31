@@ -1,3 +1,5 @@
+import 'package:app_project/Pages/serviceProviderPages/FormPage.dart';
+import 'package:app_project/Pages/home.dart';
 import 'package:app_project/Wedgits/custom_botton.dart';
 import 'package:app_project/Wedgits/custom_text_field.dart';
 import 'package:app_project/helper/showSnackBar.dart';
@@ -16,6 +18,8 @@ class SignUpScreen extends StatefulWidget {
 
 String? firstName;
 String? lastName;
+  String? documentId;
+
 
 class _SignUpScreenState extends State<SignUpScreen> {
   String? email;
@@ -213,13 +217,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email!, password: password!);
 
+
+          
+    String userId = userCredential.user!.uid;
+              String userType='Normal user';
+
+
+
       // Add user information to Firestore
-      await users.doc(userCredential.user!.uid).set({
+      await users.doc(userId).set({
         'firstName': firstName,
         'lastName': lastName,
         'email': email,
+        'userType': userType,
+        'userId': userId,
+        'createdAt': FieldValue.serverTimestamp(), 
+        
+
         // Add more fields as needed
       });
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return Home(userId: userId);
+      },));
+
     } catch (e) {
       print("Error registering user: $e");
       throw e; // Rethrow the error to handle it in the UI

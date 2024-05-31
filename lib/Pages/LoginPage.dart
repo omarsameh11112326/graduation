@@ -1,7 +1,9 @@
+import 'package:app_project/Pages/home.dart';
 import 'package:app_project/Wedgits/custom_botton.dart';
 import 'package:app_project/Wedgits/custom_text_field.dart';
 import 'package:app_project/constant.dart';
 import 'package:app_project/helper/showSnackBar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -25,6 +27,8 @@ class _loginScreenState extends State<loginScreen> {
   bool isLoading = false;
   bool keepMeLoggedIn = false;
   GlobalKey<FormState> formKey = GlobalKey();
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
+
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -160,8 +164,7 @@ class _loginScreenState extends State<loginScreen> {
                                           try {
                                             await loginUser();
                                             showSnackBar(context, 'success');
-                                            Navigator.pushNamed(
-                                                context, 'HomePage');
+                                            
                                           } on FirebaseAuthException catch (e) {
                                             if (e.code == 'weak-password') {
                                               showSnackBar(context,
@@ -236,8 +239,14 @@ class _loginScreenState extends State<loginScreen> {
 
   Future<void> loginUser() async {
     var auth = FirebaseAuth.instance;
-    UserCredential user = await auth.signInWithEmailAndPassword(
+    UserCredential userCredential = await auth.signInWithEmailAndPassword(
         email: email!, password: password!);
+            String userIdd = userCredential.user!.uid;
+
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return Home(userId:userIdd);
+      },));
+
   }
 
   Future<UserCredential> signInWithGoogle() async {

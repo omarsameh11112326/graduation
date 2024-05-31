@@ -49,6 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '685765647241',
     projectId: 'saferoad-57472',
     authDomain: 'saferoad-57472.firebaseapp.com',
+    databaseURL: 'https://saferoad-57472-default-rtdb.firebaseio.com',
     storageBucket: 'saferoad-57472.appspot.com',
   );
 
@@ -57,6 +58,7 @@ class DefaultFirebaseOptions {
     appId: '1:685765647241:android:59f65438180e2bce2a5f58',
     messagingSenderId: '685765647241',
     projectId: 'saferoad-57472',
+    databaseURL: 'https://saferoad-57472-default-rtdb.firebaseio.com',
     storageBucket: 'saferoad-57472.appspot.com',
   );
 
@@ -65,6 +67,7 @@ class DefaultFirebaseOptions {
     appId: '1:685765647241:ios:5bc4c595386d8fa82a5f58',
     messagingSenderId: '685765647241',
     projectId: 'saferoad-57472',
+    databaseURL: 'https://saferoad-57472-default-rtdb.firebaseio.com',
     storageBucket: 'saferoad-57472.appspot.com',
     iosClientId: '685765647241-jn58hs21lc45mehtkfsn7ju0mbo8tmee.apps.googleusercontent.com',
     iosBundleId: 'com.example.appProject',
@@ -75,6 +78,7 @@ class DefaultFirebaseOptions {
     appId: '1:685765647241:ios:1a04e6a5643c71732a5f58',
     messagingSenderId: '685765647241',
     projectId: 'saferoad-57472',
+    databaseURL: 'https://saferoad-57472-default-rtdb.firebaseio.com',
     storageBucket: 'saferoad-57472.appspot.com',
     iosClientId: '685765647241-96ln2brrtmrk91nsojepafejrrke687n.apps.googleusercontent.com',
     iosBundleId: 'com.example.appProject.RunnerTests',

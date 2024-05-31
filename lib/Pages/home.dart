@@ -1,10 +1,16 @@
+import 'package:app_project/Nearst/Nearst_Services_Screen.dart';
 import 'package:app_project/Pages/LoginPage.dart';
+import 'package:app_project/Pages/RequestToServiceProvider.dart';
+import 'package:app_project/Pages/Services.dart';
 import 'package:app_project/Pages/SignUp.dart';
+import 'package:app_project/Pages/userOffers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+  String userId;
+   Home({Key? key,required this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -263,10 +269,12 @@ class Home extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, "ProfilePage");
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                return UserOffers(latitude: 0,longitude: 0);
+                              },));
                           },
                           child: const Text(
-                            "Terms and\n Conditions",
+                            " Offers",
                             style: TextStyle(
                               fontSize: 20,
                               color: Color.fromARGB(255, 10, 92, 159),
@@ -275,10 +283,12 @@ class Home extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(
-                          width: 35,
+                          width: 74,
                         ),
                         IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              
+                            },
                             icon: const Icon(
                               Icons.arrow_right,
                               color: Color.fromARGB(255, 10, 92, 159),
@@ -303,7 +313,8 @@ class Home extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, "ProfilePage");
+                            checkUserTypeAndNavigate( context,userId);
+                           
                           },
                           child: const Text(
                             "Service Provider",
@@ -404,7 +415,7 @@ class Home extends StatelessWidget {
                 width: 7,
               ),
               Text(
-                'Hi,$firstName',
+                'Hi,omar',
                 style: GoogleFonts.amethysta(
                   fontSize: 35,
                 ),
@@ -420,7 +431,14 @@ class Home extends StatelessWidget {
                 width: 15,
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                      return Services();
+
+                  },
+                  
+                  ));
+                },
                 child: Card(
                   child: Container(
                     width: 150,
@@ -461,7 +479,12 @@ class Home extends StatelessWidget {
                 flex: 2,
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                    return MainHome();
+                  },));
+                },
                 child: Card(
                   child: Container(
                     width: 150,
@@ -512,7 +535,9 @@ class Home extends StatelessWidget {
                 flex: 2,
               ),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+
+                },
                 child: Card(
                   child: Container(
                     width: 150,
@@ -598,5 +623,38 @@ class Home extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> checkUserTypeAndNavigate(BuildContext context, String userId) async {
+    try {
+      CollectionReference users = FirebaseFirestore.instance.collection('users');
+
+      // Query Firestore to find the user document with the specified userId
+      QuerySnapshot querySnapshot = await users.where('userId', isEqualTo: userId).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot userDoc = querySnapshot.docs.first;
+        String userType = userDoc['userType']; // Get the userType field valueus
+
+        // Check if userType is 'service Provider'
+        if (userType == 'service Provider') {
+           Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => requestToService(),
+            ),
+                     );          
+        } else {
+           Navigator.pushNamed(context, "FormPage");         
+        }
+      } else {
+        
+        // Handle accordingly (e.g., show a message)
+        print('User document not found for userId: $userId');
+      }
+    } catch (e) {
+      // Handle error
+      print('Error checking user type: $e');
+    }
   }
 }

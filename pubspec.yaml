@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
+  sdk: '>=3.2.3 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -46,7 +46,7 @@ dependencies:
   pinput: ^4.0.0
   firebase_app_check: ^0.2.1+14
   google_fonts: ^6.1.0
-  basic_utils: ^5.7.0
+  basic_utils: ^5.6.1
   get: ^4.6.6
   firebase_database: ^10.4.10
   geolocator: ^10.1.1
@@ -55,19 +55,25 @@ dependencies:
   url_launcher: ^6.2.5
   random_string: ^2.3.1
   flutter_map: ^6.1.0
-
+  firebase_storage: ^11.6.6
+  flutter_polyline_points: ^2.0.0
+  location: ^6.0.1
+  google_maps_flutter: ^2.6.1
+  flutter_svg: ^2.0.10+1
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+
+  
   
 
 # For information on the generic Dart part of this file, see the

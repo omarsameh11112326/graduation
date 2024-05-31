@@ -1,3 +1,7 @@
+import 'package:app_project/Pages/services/FuelDelivery.dart';
+import 'package:app_project/Pages/services/JumpSart.dart';
+import 'package:app_project/Pages/services/Mechanic.dart';
+import 'package:app_project/Pages/services/TireChange.dart';
 import 'package:flutter/material.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -62,8 +66,9 @@ class _ServicesState extends State<Services> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushNamed(context, 'Tire Change');
-                                  },
+Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                      return TireChange();
+                                    },));                                  },
                                   child: Card(
                                     child: Container(
                                       width: 150,
@@ -108,7 +113,9 @@ class _ServicesState extends State<Services> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushNamed(context, 'Mechanic');
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                      return Mechanic();
+                                    },));
                                   },
                                   child: Card(
                                     child: Container(
@@ -164,8 +171,9 @@ class _ServicesState extends State<Services> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushNamed(context, 'Jump Start');
-                                  },
+Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                      return JumpStart();
+                                    },));                                  },
                                   child: Card(
                                     child: Container(
                                       width: 150,
@@ -210,8 +218,9 @@ class _ServicesState extends State<Services> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushNamed(
-                                        context, 'Fuel Delivery');
+                                   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                      return FuelDelivery();
+                                    },));
                                   },
                                   child: Card(
                                     child: Container(

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "685765647241",
+    "project_id": "saferoad-57472",
+    "storage_bucket": "saferoad-57472.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685765647241:android:59f65438180e2bce2a5f58",
+        "android_client_info": {
+          "package_name": "com.example.app_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "685765647241-oaa0q130k9rm04sjo15g0mie51t48d2j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCusbjfgSS_F0pyYUu7LofJyQcZEV5A7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "685765647241-oaa0q130k9rm04sjo15g0mie51t48d2j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

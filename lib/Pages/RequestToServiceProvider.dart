@@ -20,7 +20,9 @@ String? price;
 String? TypeOfService;
 late String phone = '';
   late String userId;
+   String? serverTimestamp;
   bool isLoading = false;
+  bool IsAccepted= false;
 
 
 
@@ -173,7 +175,6 @@ int _selectedIndex = 0; // Current tab index
                                   
                                       try {
                                         await ServiceProviderResponse(price!,serviceType);
-                                        await DeleteDoc(documentId);
                                         showSnackBar(context, 'success');
                                         }catch(e){
                                           print(e);
@@ -307,12 +308,18 @@ int _selectedIndex = 0; // Current tab index
 
     // Fetch phone number from Firestore 'form' collection
     String? phoneNumber = await getPhoneNumber();
+    getUserId();
+    
 
     DocumentReference docRef = await firestore.collection('serviceProviderRequest').add({
       'price': price,
       'typeOfServide': TypeOfService,
       'phoneNumper': phoneNumber, // Add phone number to the document
+      'IsAccepted': IsAccepted, 
+      'userId': userId,
+        'createdAt': FieldValue.serverTimestamp(), 
     });
+    
 
     print('Document added with ID: ${docRef.id}');
   } catch (error) {
@@ -337,6 +344,7 @@ Future<void> DeleteDoc(String documentId) async {
     print('Error deleting user request: $error');
   }
 }
+
 
 
 }

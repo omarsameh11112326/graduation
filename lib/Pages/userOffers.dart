@@ -21,6 +21,8 @@ class _requestToServiceState extends State<UserOffers> {
 String? price;
 
 String? TypeOfService;
+String? userId;
+ bool isAccepted = true;
 
 
   @override
@@ -162,20 +164,22 @@ String? TypeOfService;
                                   GestureDetector(
                                     onTap: () async{
                                        String documentId = snapshot.data!.docs[index].id;
+
                                       
-    try {
-      List<Map<String, dynamic>> userRequests = await fetchUserRequests();
-      if (userRequests.isNotEmpty) {
-        double latitude = userRequests.first['latitude'];
-        double longitude = userRequests.first['longitude'];
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return Live(latitude: latitude, longitude: longitude);
-        }));
-        await DeleteDoc(documentId);
-      }
-    } catch (e) {
-      print(e);
-    }
+                                         try {
+
+                                         List<Map<String, dynamic>> userRequests = await fetchUserRequests();
+                                          if (userRequests.isNotEmpty) {
+                                          double latitude = userRequests.first['latitude'];
+                                          double longitude = userRequests.first['longitude'];
+                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                          return Live(latitude: latitude, longitude: longitude);
+                                          }));
+
+                                            }
+                                               } catch (e) {
+                                                   print(e);
+                                                            }
   
 
                                     },
@@ -240,14 +244,18 @@ String? TypeOfService;
       print('Error saving user request: $error');
       }
     }
+
+    
     Future<List<Map<String, dynamic>>> fetchUserRequests() async {
   try {
     // Access Firestore instance
     final firestoreInstance = FirebaseFirestore.instance;
 
     // Fetch documents from the userRequest collection
-    QuerySnapshot querySnapshot =
-        await firestoreInstance.collection('userRequest').get();
+    QuerySnapshot querySnapshot = await firestoreInstance
+        .collection('userRequest')
+        .orderBy('createdAt', descending: true)
+        .get();
 
     // Extract latitude and longitude from each document and add them to a list
     List<Map<String, dynamic>> userRequests = [];
@@ -272,6 +280,48 @@ String? TypeOfService;
     return []; // Return an empty list if an error occurs
   }
 }
+  
+     Future<void> getUserId() async {
+    // Get the current user ID from Firebase Authentication
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        userId = user.uid;
+      });
+    }
+  }
+Future<void> updateIsAcceptedByUserId( ) async {
+  try {
+    getUserId();
+
+    // Access Firestore instance
+    final firestore = FirebaseFirestore.instance;
+    // Query the collection to find the document with the specified userId
+    QuerySnapshot querySnapshot = await firestore
+        .collection('serviceProviderRequest')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Assuming userId is unique and only one document is returned
+      DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+      String documentId = documentSnapshot.id;
+
+      // Update the 'IsAccepted' field in the found document
+      await firestore.collection('serviceProviderRequest').doc(documentId).update({
+        'IsAccepted': isAccepted,
+      });
+
+      print('Document with userId $userId updated with IsAccepted: $isAccepted');
+    } else {
+      print('No document found with userId $userId');
+    }
+  } catch (error) {
+    // Handle errors
+    print('Error updating document: $error');
+  }
+}
+
 
   
 }

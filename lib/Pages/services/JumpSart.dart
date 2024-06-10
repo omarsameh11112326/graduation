@@ -381,8 +381,9 @@ void _saveUserRequest() async {
       'location': location,
       'latitude': latitude,
       'longitude': longitude,
-      'serviceType': 'Fuel Delivery',
+      'serviceType': 'Jump Start',
       'userId': userId,
+        'createdAt': FieldValue.serverTimestamp(), 
     });
 
     // Request saved successfully

@@ -1,6 +1,8 @@
+import 'package:app_project/AdminPannel/waitingScreen.dart';
 import 'package:app_project/Pages/Services.dart';
 import 'package:app_project/Pages/home.dart';
 import 'package:app_project/Pages/serviceProviderPages/profileServiceProvider.dart';
+import 'package:app_project/Pages/serviceProviderPages/waitingScreenServiceProvider.dart';
 import 'package:app_project/helper/showSnackBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -175,6 +177,8 @@ int _selectedIndex = 0; // Current tab index
                                   
                                       try {
                                         await ServiceProviderResponse(price!,serviceType);
+                                        
+
                                         showSnackBar(context, 'success');
                                         }catch(e){
                                           print(e);
@@ -319,7 +323,9 @@ int _selectedIndex = 0; // Current tab index
       'userId': userId,
         'createdAt': FieldValue.serverTimestamp(), 
     });
-    
+     Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                         return WaitingScreen2(userId: userId,);
+                         },));
 
     print('Document added with ID: ${docRef.id}');
   } catch (error) {

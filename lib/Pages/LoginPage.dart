@@ -1,9 +1,8 @@
-import 'package:app_project/Pages/home.dart';
+import 'package:app_project/AdminPannel/homeAdmin.dart';
 import 'package:app_project/Wedgits/custom_botton.dart';
 import 'package:app_project/Wedgits/custom_text_field.dart';
 import 'package:app_project/constant.dart';
 import 'package:app_project/helper/showSnackBar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -27,8 +26,6 @@ class _loginScreenState extends State<loginScreen> {
   bool isLoading = false;
   bool keepMeLoggedIn = false;
   GlobalKey<FormState> formKey = GlobalKey();
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
-
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -45,7 +42,7 @@ class _loginScreenState extends State<loginScreen> {
               ),
               child: Stack(
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 60.0, left: 22),
                     child: Text(
                       'Hello\nSign in!',
@@ -63,7 +60,7 @@ class _loginScreenState extends State<loginScreen> {
                           Padding(
                             padding: const EdgeInsets.only(top: 200.0),
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(40),
                                     topRight: Radius.circular(40)),
@@ -77,28 +74,32 @@ class _loginScreenState extends State<loginScreen> {
                                     top: 40),
                                 child: Column(
                                   children: [
-                                    const SizedBox(
+                                    SizedBox(
                                       height: 8,
                                     ),
                                     CustomFormTextField(
                                       onchanged: (data) {
-                                        email = data;
+                                        setState(() {
+                                          email = data;
+                                        });
                                       },
                                       hintText: 'Email',
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.email,
                                         color: Colors.grey,
                                       ),
                                     ),
-                                    const SizedBox(
+                                    SizedBox(
                                       height: 12,
                                     ),
                                     CustomFormTextField(
                                       onchanged: (data) {
-                                        password = data;
+                                        setState(() {
+                                          password = data;
+                                        });
                                       },
                                       hintText: 'password',
-                                      icon: const Icon(
+                                      icon: Icon(
                                         Icons.visibility_off,
                                         color: Colors.grey,
                                       ),
@@ -123,7 +124,7 @@ class _loginScreenState extends State<loginScreen> {
                                             ),
                                           ),
                                         ),
-                                        const Expanded(
+                                        Expanded(
                                           flex: 2,
                                           child: Text(
                                             'Remember me',
@@ -153,7 +154,7 @@ class _loginScreenState extends State<loginScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(
+                                    SizedBox(
                                       height: 90,
                                     ),
                                     CustomButton(
@@ -164,7 +165,6 @@ class _loginScreenState extends State<loginScreen> {
                                           try {
                                             await loginUser();
                                             showSnackBar(context, 'success');
-                                            
                                           } on FirebaseAuthException catch (e) {
                                             if (e.code == 'weak-password') {
                                               showSnackBar(context,
@@ -191,12 +191,12 @@ class _loginScreenState extends State<loginScreen> {
                                     ),
                                     Column(
                                       children: [
-                                        const Text(
+                                        Text(
                                           "Or Login with",
                                           style: TextStyle(
                                               color: Colors.grey, fontSize: 20),
                                         ),
-                                        const SizedBox(height: 30),
+                                        SizedBox(height: 30),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceEvenly,
@@ -239,14 +239,35 @@ class _loginScreenState extends State<loginScreen> {
 
   Future<void> loginUser() async {
     var auth = FirebaseAuth.instance;
-    UserCredential userCredential = await auth.signInWithEmailAndPassword(
-        email: email!, password: password!);
-            String userIdd = userCredential.user!.uid;
 
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return Home(userId:userIdd);
-      },));
+    try {
+      // Ensure that email and password are not null
+      if (email != null && password != null) {
+        // Sign in the user with email and password
+        UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: email!,
+          password: password!,
+        );
 
+        // Check if the entered credentials match the admin credentials
+        if (email == 'menna@gmail.com' && password == '123456') {
+          // Navigate to AdminPanelScreen
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return AdminPanelScreen();
+          },));
+        } else {
+          // Navigate to HomePage or any other screen for regular users
+          Navigator.pushReplacementNamed(context, 'HomePage');
+        }
+      } else {
+        // Handle null email or password (this shouldn't occur if form validation is properly set)
+        showSnackBar(context, 'Please enter email and password.');
+      }
+    } catch (e) {
+      // Handle any login errors here
+      print('Login Error: $e');
+      showSnackBar(context, 'Login failed. Please check your credentials.');
+    }
   }
 
   Future<UserCredential> signInWithGoogle() async {

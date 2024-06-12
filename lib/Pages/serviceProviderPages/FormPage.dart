@@ -1,9 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
-
+import 'package:app_project/AdminPannel/waitingScreen.dart';
 import 'package:app_project/Pages/RequestToServiceProvider.dart';
 import 'package:app_project/Pages/image_picker.dart';
-import 'package:app_project/Pages/serviceProviderPages/profileServiceProvider.dart';
 import 'package:app_project/State/MainState.dart';
 import 'package:app_project/Wedgits/custom_botton.dart';
 import 'package:app_project/Wedgits/custom_text_field.dart';
@@ -18,13 +18,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class FormScreen extends StatefulWidget {
-
   FormScreen({Key? key}) : super(key: key);
 
   @override
   State<FormScreen> createState() => _FormScreenState();
 }
-
 
 Uint8List? _image;
 File? selectedIMage;
@@ -47,7 +45,6 @@ class _FormScreenState extends State<FormScreen> {
     // Call a function to fetch user ID when the widget is initialized
     getUserId();
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -223,9 +220,8 @@ class _FormScreenState extends State<FormScreen> {
                                   height: 70,
                                 ),
                                 CustomButton(
-                                  onTap: (){
-                                   updateUserType();
-
+                                  onTap: () {
+                                    updateUserType();
                                     saveFormData();
                                   },
                                   text: 'SUBMIT',
@@ -355,8 +351,8 @@ class _FormScreenState extends State<FormScreen> {
       },
     );
   }
+
   Future<void> getUserId() async {
-    // Get the current user ID from Firebase Authentication
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       setState(() {
@@ -364,7 +360,6 @@ class _FormScreenState extends State<FormScreen> {
       });
     }
   }
-
 
  Future<void> saveFormData() async {
   setState(() {
@@ -377,11 +372,7 @@ class _FormScreenState extends State<FormScreen> {
 
     String? imageUrl1;
     String? imageUrl2;
-     
-      
-          
 
-    // Upload images to Firebase Storage and get download URLs
     if (_imageid != null) {
       imageUrl1 = await _uploadImageToStorage(_imageid!);
     }
@@ -389,7 +380,7 @@ class _FormScreenState extends State<FormScreen> {
     if (_imageFile != null) {
       imageUrl2 = await _uploadImageToStorage(_imageFile!);
     }
-    // Save form data to Firestore
+
     DocumentReference docRef = await FirebaseFirestore.instance.collection('form').add({
       'businessName': BusinessName,
       'nationalID': imageUrl1,
@@ -397,10 +388,11 @@ class _FormScreenState extends State<FormScreen> {
       'place': imageUrl2,
       'selectedValue': selectedValue,
       'phone': phone,
-      'userId': userId, // Set the userId field in the 'form' document
-
+      'userId': userId,
+      'status': 'pending',
+      'lat': position.latitude,
+      'long': position.longitude,
     });
-   
 
     setState(() {
       isLoading = false;
@@ -410,11 +402,10 @@ class _FormScreenState extends State<FormScreen> {
     });
 
     if (documentId != null) {
-      // Navigate to profile screen after successful form submission
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => requestToService(),
+          builder: (context) => WaitingScreen(formId: documentId!),
         ),
       );
     } else {
@@ -425,11 +416,8 @@ class _FormScreenState extends State<FormScreen> {
       isLoading = false;
     });
     print('Error saving form data: $e');
-    // Handle error and display appropriate message
-    // You can use a SnackBar or Dialog to show the error message
   }
 }
-
 
   Future<String?> _uploadImageToStorage(File imageFile) async {
     try {
@@ -444,17 +432,18 @@ class _FormScreenState extends State<FormScreen> {
     }
   }
 
-  
- Future<void> updateUserType() async {
+  Future<void> updateUserType() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      CollectionReference users = FirebaseFirestore.instance.collection('users');
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
 
       // Fetch the last document in the collection
-      QuerySnapshot querySnapshot = await users.orderBy('createdAt' ,descending: true).limit(1).get();
+      QuerySnapshot querySnapshot =
+          await users.orderBy('createdAt', descending: true).limit(1).get();
       if (querySnapshot.docs.isNotEmpty) {
         DocumentSnapshot lastDocument = querySnapshot.docs.first;
         // Update user document with the provided data

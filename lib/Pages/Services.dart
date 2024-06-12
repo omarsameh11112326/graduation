@@ -3,7 +3,6 @@ import 'package:app_project/Pages/services/JumpSart.dart';
 import 'package:app_project/Pages/services/Mechanic.dart';
 import 'package:app_project/Pages/services/TireChange.dart';
 import 'package:flutter/material.dart';
-import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class Services extends StatefulWidget {
@@ -28,17 +27,7 @@ class _ServicesState extends State<Services> {
           decoration: const BoxDecoration(),
           child: Column(
             children: [
-              Expanded(
-                child: FlutterLocationPicker(
-                  initZoom: 11,
-                  minZoomLevel: 5,
-                  maxZoomLevel: 16,
-                  trackMyPosition: true,
-                  onPicked: (pickedData) {
-                    addressOfUser = pickedData.address;
-                  },
-                ),
-              ),
+            
               Expanded(
                 child: SingleChildScrollView(
                   child: Padding(

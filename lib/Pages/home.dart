@@ -5,13 +5,19 @@ import 'package:app_project/Pages/Services.dart';
 import 'package:app_project/Pages/SignUp.dart';
 import 'package:app_project/Pages/userOffers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   String userId;
    Home({Key? key,required this.userId}) : super(key: key);
 
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -313,7 +319,8 @@ class Home extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            checkUserTypeAndNavigate( context,userId);
+                            getUserId();
+                            checkUserTypeAndNavigate( context,widget.userId);
                            
                           },
                           child: const Text(
@@ -623,6 +630,15 @@ class Home extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> getUserId() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+         widget.userId = user.uid;
+      });
+    }
   }
 
   Future<void> checkUserTypeAndNavigate(BuildContext context, String userId) async {

@@ -17,13 +17,10 @@ class UserOffers extends StatefulWidget {
 }
 
 class _requestToServiceState extends State<UserOffers> {
-
-String? price;
-
-String? TypeOfService;
-String? userId;
- bool isAccepted = true;
-
+  String? price;
+  String? TypeOfService;
+  String? userId;
+  bool isAccepted = true;
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +76,7 @@ String? userId;
                             Row(
                               children: [
                                 const Icon(Icons.design_services),
-                                                                SizedBox(width: 5,),
-
+                                SizedBox(width: 5,),
                                 Text(
                                   'Type Of Service : $serviceType ',
                                   style: const TextStyle(
@@ -123,17 +119,15 @@ String? userId;
                               padding: const EdgeInsets.only(left: 30.0),
                               child: Row(
                                 children: [
-                                  
                                   GestureDetector(
-                                    onTap: () async{
-                                       String documentId = snapshot.data!.docs[index].id;
+                                    onTap: () async {
+                                      String documentId = snapshot.data!.docs[index].id;
                                       try {
-                                        await DeleteDoc(documentId);
+                                        await deleteDoc(documentId);
                                         showSnackBar(context, 'success');
-                                        }catch(e){
-                                          print(e);
-                                        }
-
+                                      } catch (e) {
+                                        print(e);
+                                      }
                                     },
                                     child: Container(
                                       height: 40,
@@ -159,31 +153,24 @@ String? userId;
                                       ),
                                     ),
                                   ),
-                                                                    const SizedBox(width: 65),
-
+                                  const SizedBox(width: 65),
                                   GestureDetector(
-                                    onTap: () async{
-                                       String documentId = snapshot.data!.docs[index].id;
-
-                                      
-                                         try {
-
-                                         List<Map<String, dynamic>> userRequests = await fetchUserRequests();
-                                          if (userRequests.isNotEmpty) {
+                                    onTap: () async {
+                                      String documentId = snapshot.data!.docs[index].id;
+                                      try {
+                                        await updateIsAccepted(documentId);
+                                        List<Map<String, dynamic>> userRequests = await fetchUserRequests();
+                                        if (userRequests.isNotEmpty) {
                                           double latitude = userRequests.first['latitude'];
                                           double longitude = userRequests.first['longitude'];
                                           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                                          return Live(latitude: latitude, longitude: longitude);
+                                            return Live(latitude: latitude, longitude: longitude);
                                           }));
-
-                                            }
-                                               } catch (e) {
-                                                   print(e);
-                                                            }
-  
-
+                                        }
+                                      } catch (e) {
+                                        print(e);
+                                      }
                                     },
-                                    
                                     child: Container(
                                       height: 40,
                                       width: 100,
@@ -224,65 +211,52 @@ String? userId;
       ),
     );
   }
-   Future<void> DeleteDoc(String documentId) async {
-     try {
-     
-      // Access Firestore instance
+
+  Future<void> deleteDoc(String documentId) async {
+    try {
       final firestoreInstance = FirebaseFirestore.instance;
-
-     
-      // Add document to 'userRequest' collection
-      DocumentReference docrRef= await firestoreInstance.collection('serviceProviderRequest').doc(documentId);
-
-
-      await docrRef.delete();
-      
-
-      // Optionally, you can show a success message or navigate to a new screen here
+      DocumentReference docRef = firestoreInstance.collection('serviceProviderRequest').doc(documentId);
+      await docRef.delete();
     } catch (error) {
-      // Handle errors
-      print('Error saving user request: $error');
-      }
+      print('Error deleting document: $error');
     }
-
-    
-    Future<List<Map<String, dynamic>>> fetchUserRequests() async {
-  try {
-    // Access Firestore instance
-    final firestoreInstance = FirebaseFirestore.instance;
-
-    // Fetch documents from the userRequest collection
-    QuerySnapshot querySnapshot = await firestoreInstance
-        .collection('userRequest')
-        .orderBy('createdAt', descending: true)
-        .get();
-
-    // Extract latitude and longitude from each document and add them to a list
-    List<Map<String, dynamic>> userRequests = [];
-    querySnapshot.docs.forEach((doc) {
-      // Extract latitude and longitude fields from the document data
-      double latitude = doc['latitude'] ?? 0.0;
-      double longitude = doc['longitude'] ?? 0.0;
-      
-      // Create a map containing latitude and longitude
-      Map<String, dynamic> userData = {
-        'latitude': latitude,
-        'longitude': longitude,
-      };
-
-      userRequests.add(userData);
-    });
-
-    return userRequests;
-  } catch (error) {
-    // Handle errors
-    print('Error fetching user requests: $error');
-    return []; // Return an empty list if an error occurs
   }
-}
-  
-     Future<void> getUserId() async {
-    // Get the current user ID from Firebase Authentication
+
+  Future<void> updateIsAccepted(String documentId) async {
+    try {
+      final firestoreInstance = FirebaseFirestore.instance;
+      DocumentReference docRef = firestoreInstance.collection('serviceProviderRequest').doc(documentId);
+      await docRef.update({'IsAccepted': true});
+    } catch (error) {
+      print('Error updating document: $error');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchUserRequests() async {
+    try {
+      final firestoreInstance = FirebaseFirestore.instance;
+      QuerySnapshot querySnapshot = await firestoreInstance
+          .collection('userRequest')
+          .orderBy('createdAt', descending: true)
+          .get();
+      List<Map<String, dynamic>> userRequests = [];
+      querySnapshot.docs.forEach((doc) {
+        double latitude = doc['latitude'] ?? 0.0;
+        double longitude = doc['longitude'] ?? 0.0;
+        Map<String, dynamic> userData = {
+          'latitude': latitude,
+          'longitude': longitude,
+        };
+        userRequests.add(userData);
+      });
+      return userRequests;
+    } catch (error) {
+      print('Error fetching user requests: $error');
+      return [];
+    }
+  }
+
+  Future<void> getUserId() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       setState(() {
@@ -290,38 +264,4 @@ String? userId;
       });
     }
   }
-Future<void> updateIsAcceptedByUserId( ) async {
-  try {
-    getUserId();
-
-    // Access Firestore instance
-    final firestore = FirebaseFirestore.instance;
-    // Query the collection to find the document with the specified userId
-    QuerySnapshot querySnapshot = await firestore
-        .collection('serviceProviderRequest')
-        .where('userId', isEqualTo: userId)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      // Assuming userId is unique and only one document is returned
-      DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
-      String documentId = documentSnapshot.id;
-
-      // Update the 'IsAccepted' field in the found document
-      await firestore.collection('serviceProviderRequest').doc(documentId).update({
-        'IsAccepted': isAccepted,
-      });
-
-      print('Document with userId $userId updated with IsAccepted: $isAccepted');
-    } else {
-      print('No document found with userId $userId');
-    }
-  } catch (error) {
-    // Handle errors
-    print('Error updating document: $error');
-  }
-}
-
-
-  
 }

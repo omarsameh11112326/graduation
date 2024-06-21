@@ -1,33 +1,21 @@
-import 'package:app_project/AdminPannel/homeAdmin.dart';
+import 'package:app_project/Pages/RequestToServiceProvider.dart';
 import 'package:app_project/Wedgits/custom_botton.dart';
-import 'package:app_project/Wedgits/custom_text_field.dart';
-import 'package:app_project/constant.dart';
+
 import 'package:app_project/helper/showSnackBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lottie/lottie.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class loginScreen extends StatefulWidget {
-  loginScreen({Key? key}) : super(key: key);
+class ServicePage extends StatelessWidget {
+  ServicePage({Key? key}) : super(key: key);
 
-  @override
-  State<loginScreen> createState() => _loginScreenState();
-}
-
-String? email;
-
-String? password;
-
-GlobalKey<FormState> formKey = GlobalKey();
-
-class _loginScreenState extends State<loginScreen> {
   bool isLoading = false;
+
   bool keepMeLoggedIn = false;
+
   GlobalKey<FormState> formKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -47,7 +35,7 @@ class _loginScreenState extends State<loginScreen> {
                   Padding(
                     padding: EdgeInsets.only(top: 60.0, left: 22),
                     child: Text(
-                      'Hello\nSign in!',
+                      'Service Progress',
                       style: TextStyle(
                           fontSize: 30,
                           color: Colors.white,
@@ -71,7 +59,7 @@ class _loginScreenState extends State<loginScreen> {
                                   left: 18.0,
                                   right: 18,
                                   bottom: 100,
-                                  top: 40),
+                                  top: 100),
                               child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,28 +81,35 @@ class _loginScreenState extends State<loginScreen> {
                 }
               },
             ),
-            ElevatedButton(
-              onPressed: () {
+            CustomButton(
+              onTap: () {
                 // Navigate or perform action for "Start Service"
                 serviecProgress('Service Provider Arrived');
+                showSnackBar(context,'Service Arrived send to client');
               },
-              child: Text('Service Provider Arrived'),
+              text: 'Service Provider Arrived',
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
+            CustomButton(
+              onTap: () {
                 // Navigate or perform action for "Service in Progress"
                 serviceProgressUpdate1('Service in Progress');
- },
-              child: Text('Service in Progress'),
+                showSnackBar(context,'Service InProgress send to client');
+                },
+                text: 'Service in Progress',
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
+            CustomButton(
+              onTap: () {
                 // Navigate or perform action for "Service Ended"
                 serviceProgressUpdate2('Service Ended');
+                showSnackBar(context,'Service Ended send to client');
+                 Navigator.of(context).push(MaterialPageRoute(builder: (context){
+                      return requestToService();
+                    }));
+                
               },
-              child: Text('Service Ended'),
+              text: 'Service Ended',
             ),
             
           ],
@@ -130,6 +125,7 @@ class _loginScreenState extends State<loginScreen> {
               ))),
     );
   }
+
 Future<String> fetchLottieAnimation() async {
     // Replace with your actual Lottie animation URL
     String animationUrl = 'https://example.com/your-lottie-animation.json';
@@ -137,6 +133,7 @@ Future<String> fetchLottieAnimation() async {
     await Future.delayed(Duration(seconds: 2));
     return animationUrl;
   }
+
   Future<void> serviecProgress(String TextButton) async {
  
 
@@ -157,6 +154,7 @@ Future<String> fetchLottieAnimation() async {
     print('Error saving form data: $e');
   }
 }
+
   Future<void> serviceProgressUpdate1(String textButton) async {
   try {
     // Query the Firestore collection to get the last document created
@@ -187,6 +185,7 @@ Future<String> fetchLottieAnimation() async {
     print('Error updating document: $e');
   }
 }
+
   Future<void> serviceProgressUpdate2(String textButton) async {
   try {
     // Query the Firestore collection to get the last document created
@@ -217,7 +216,10 @@ Future<String> fetchLottieAnimation() async {
     print('Error updating document: $e');
   }
 }
-  
-
-  
 }
+
+String? email;
+
+String? password;
+
+GlobalKey<FormState> formKey = GlobalKey();

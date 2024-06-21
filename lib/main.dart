@@ -11,11 +11,13 @@ import 'package:app_project/Pages/forgot.dart';
 import 'package:app_project/Pages/home.dart';
 import 'package:app_project/Pages/phonePage.dart';
 import 'package:app_project/Pages/services/TireChange.dart';
+import 'package:app_project/Pages/userWaitingScreen.dart';
 
 import 'package:app_project/Pages/verfiy.dart';
 import 'package:app_project/Pages/welcomeScreen.dart';
 import 'package:app_project/constant.dart';
 import 'package:app_project/firebase_options.dart';
+import 'package:app_project/Pages/serviceProviderPages/ServiceProgress.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +65,7 @@ class SafeRoad extends StatelessWidget {
               'ForgetPassword': (context) => const ForgotPassword(),
               'WelcomePage': (context) => const WelcomeScreen(),
             },
-            home: WelcomeScreen(),
+            home: userWaitingScreen(),
           );
         }
       },

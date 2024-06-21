@@ -1,4 +1,5 @@
 import 'package:app_project/Pages/googleMaps/googleMaps.dart';
+import 'package:app_project/Pages/userWaitingScreen.dart';
 import 'package:app_project/helper/showSnackBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -159,17 +160,12 @@ class _requestToServiceState extends State<UserOffers> {
                                       String documentId = snapshot.data!.docs[index].id;
                                       try {
                                         await updateIsAccepted(documentId);
-                                        List<Map<String, dynamic>> userRequests = await fetchUserRequests();
+                                        Navigator.of(context).push(MaterialPageRoute(builder: (context){
 
-                                        if (userRequests.isNotEmpty ) {
-                                          double latitude = userRequests.first['latitude'];
-                                          double longitude = userRequests.first['longitude'];
-                                         
-                                         
-                                          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                                            return Live(latitude: latitude, longitude: longitude, latitude2: 0.0, longitude2: 0.0,);
-                                          }));
-                                        }
+                                          return userWaitingScreen();
+                                        }));
+
+                                        
                                       } catch (e) {
                                         print(e);
                                       }
@@ -235,29 +231,7 @@ class _requestToServiceState extends State<UserOffers> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchUserRequests() async {
-    try {
-      final firestoreInstance = FirebaseFirestore.instance;
-      QuerySnapshot querySnapshot = await firestoreInstance
-          .collection('userRequest')
-          .orderBy('createdAt', descending: true)
-          .get();
-      List<Map<String, dynamic>> userRequests = [];
-      querySnapshot.docs.forEach((doc) {
-        double latitude = doc['latitude'] ?? 0.0;
-        double longitude = doc['longitude'] ?? 0.0;
-        Map<String, dynamic> userData = {
-          'latitude': latitude,
-          'longitude': longitude,
-        };
-        userRequests.add(userData);
-      });
-      return userRequests;
-    } catch (error) {
-      print('Error fetching user requests: $error');
-      return [];
-    }
-  }
+  
   Future<List<Map<String, dynamic>>> fetchSreviceProviderLatLong() async {
     try {
       final firestoreInstance = FirebaseFirestore.instance;

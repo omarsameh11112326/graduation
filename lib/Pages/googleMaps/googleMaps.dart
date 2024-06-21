@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:app_project/Wedgits/custom_botton.dart';
+import 'package:app_project/Pages/serviceProviderPages/ServiceProgress.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
@@ -32,7 +34,7 @@ class _LiveState extends State<Live> {
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
   PolylinePoints polylinePoints = PolylinePoints();
-  String googleAPiKey = "AIzaSyCzG2PxSPsIeiSrfbxN4zrYvmFVUhmRwZM"; // Replace with your Google API Key
+  String googleAPiKey = "AIzaSyCzG2PxSPsIeiSrfbxN4zrYvmFVUhmRwZM"; 
 
   @override
   void initState() {
@@ -119,6 +121,25 @@ class _LiveState extends State<Live> {
           onMapCreated: (GoogleMapController controller) {
             _googleMapController.complete(controller);
           },
+        ),
+        Positioned(
+          bottom: 20,
+          left: 20,
+          right: 20,
+          child:  CustomButton(
+            
+            
+           onTap: ()  {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context){
+                      return ServicePage();
+                    }));
+          },
+
+          text: 'Arrived',
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(8),
+        
+          ),
         ),
       ],
     );

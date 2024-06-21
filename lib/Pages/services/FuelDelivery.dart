@@ -325,6 +325,7 @@ class _FuelDeliveryState extends State<FuelDelivery> {
                                 // Save user request to Firestore
 
                                 _saveUserRequest();
+                                GoogleNavigateUser();
                                  Navigator.of(context).push(MaterialPageRoute(builder: 
                                 (context) {
                                   return UserOffers(
@@ -381,6 +382,47 @@ void _saveUserRequest() async {
       'latitude': latitude,
       'longitude': longitude,
       'serviceType': 'Fuel Delivery',
+      'userId': userId,
+        'createdAt': FieldValue.serverTimestamp(), 
+    });
+
+    // Request saved successfully
+    setState(() {
+      isLoading = false; // Hide loading indicator
+    });
+
+    // Optionally, you can show a success message or navigate to a new screen here
+  } catch (error) {
+    // Handle errors
+    print('Error saving user request: $error');
+    setState(() {
+      isLoading = false; // Hide loading indicator in case of error
+    });
+  }
+}
+void GoogleNavigateUser() async {
+  try {
+    setState(() {
+      isLoading = true; // Show loading indicator
+    });
+    String? userId = await getUserId();
+
+    // Access Firestore instance
+    final firestoreInstance = FirebaseFirestore.instance;
+
+    // Get the description and location
+    String location = "$address"; // You need to update this with actual location
+    LatLng lastMarkerPosition = _markers.last.position;
+    double latitude = lastMarkerPosition.latitude;
+    double longitude = lastMarkerPosition.longitude;
+
+    // Add document to 'userRequest' collection
+    await firestoreInstance.collection('googleMapsNavigation').add({
+      'location': location,
+      'userLat': latitude,
+      'userLong': longitude,
+      'serviceProviderLat': 0.0,
+      'serviceProviderLong': 0.0,
       'userId': userId,
         'createdAt': FieldValue.serverTimestamp(), 
     });

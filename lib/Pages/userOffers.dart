@@ -160,11 +160,14 @@ class _requestToServiceState extends State<UserOffers> {
                                       try {
                                         await updateIsAccepted(documentId);
                                         List<Map<String, dynamic>> userRequests = await fetchUserRequests();
-                                        if (userRequests.isNotEmpty) {
+
+                                        if (userRequests.isNotEmpty ) {
                                           double latitude = userRequests.first['latitude'];
                                           double longitude = userRequests.first['longitude'];
+                                         
+                                         
                                           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                                            return Live(latitude: latitude, longitude: longitude);
+                                            return Live(latitude: latitude, longitude: longitude, latitude2: 0.0, longitude2: 0.0,);
                                           }));
                                         }
                                       } catch (e) {
@@ -250,6 +253,29 @@ class _requestToServiceState extends State<UserOffers> {
         userRequests.add(userData);
       });
       return userRequests;
+    } catch (error) {
+      print('Error fetching user requests: $error');
+      return [];
+    }
+  }
+  Future<List<Map<String, dynamic>>> fetchSreviceProviderLatLong() async {
+    try {
+      final firestoreInstance = FirebaseFirestore.instance;
+      QuerySnapshot querySnapshot = await firestoreInstance
+          .collection('form')
+          .orderBy('createdAt', descending: true)
+          .get();
+      List<Map<String, dynamic>> ServiceProviderLat = [];
+      querySnapshot.docs.forEach((doc) {
+        double latitude = doc['lat'] ?? 0.0;
+        double longitude = doc['long'] ?? 0.0;
+        Map<String, dynamic> userData = {
+          'latitude2': latitude,
+          'longitude2': longitude,
+        };
+        ServiceProviderLat.add(userData);
+      });
+      return ServiceProviderLat;
     } catch (error) {
       print('Error fetching user requests: $error');
       return [];

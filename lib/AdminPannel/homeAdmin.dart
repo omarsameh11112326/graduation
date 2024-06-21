@@ -213,7 +213,10 @@ class ServiceProviderDetails extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(Icons.check, color: Colors.green),
-                  onPressed: () => _approveServiceProvider(context, data),
+                  onPressed: (){
+                    _approveServiceProvider(context, data);
+                    updateUserType();
+                  } ,
                 ),
                 IconButton(
                   icon: Icon(Icons.close, color: Colors.red),
@@ -464,8 +467,36 @@ class Dashboard extends StatelessWidget {
         ),
       ),
     );
-  }
+  } 
+
 }
+Future<void> updateUserType() async {
+    
+
+    try {
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+
+      // Fetch the last document in the collection
+      QuerySnapshot querySnapshot =
+          await users.orderBy('createdAt', descending: true).limit(1).get();
+      if (querySnapshot.docs.isNotEmpty) {
+        DocumentSnapshot lastDocument = querySnapshot.docs.first;
+        // Update user document with the provided data
+        await users.doc(lastDocument.id).update({
+          'userType': 'service Provider',
+          // Add more fields as needed
+        });
+      }
+
+     
+    } catch (e) {
+      
+      print('Error updating user type: $e');
+      // Handle error accordingly
+    }
+  }
+
 
 // Class to hold chart data
 class _ChartData {
